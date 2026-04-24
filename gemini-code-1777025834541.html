@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Plyr Viewer</title>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <style>
+        body { background: #000; margin: 0; display: flex; height: 100vh; align-items: center; }
+        .plyr__video-embed { width: 100%; max-width: 1000px; margin: auto; }
+    </style>
+</head>
+<body>
+
+    <div class="plyr__video-embed" id="player">
+        <iframe src="" allowfullscreen allowtransparency allow="autoplay"></iframe>
+    </div>
+
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <script>
+        // 1. Obtener el ID del video de la URL (?v=ID)
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoId = urlParams.get('v');
+
+        if (videoId) {
+            const iframe = document.querySelector('iframe');
+            iframe.src = `https://www.youtube.com/embed/${videoId}?origin=https://plyr.io&iv_load_policy=3&modestbranding=1&playsinline=1&showinfo=0&rel=0&enablejsapi=1`;
+            
+            // 2. Inicializar Plyr
+            const player = new Plyr('#player');
+        } else {
+            document.body.innerHTML = "<h1 style='color:white; text-align:center;'>No se detectó ID de video</h1>";
+        }
+    </script>
+</body>
+</html>
