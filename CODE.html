@@ -2,34 +2,70 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Plyr Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plyr Premium Player</title>
+    
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    
     <style>
-        body { background: #000; margin: 0; display: flex; height: 100vh; align-items: center; }
-        .plyr__video-embed { width: 100%; max-width: 1000px; margin: auto; }
+        /* Estilo minimalista para PC */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+        .video-container {
+            width: 100%;
+            height: 100%;
+            max-width: 1200px; /* Ajuste para monitores grandes */
+            aspect-ratio: 16 / 9;
+        }
     </style>
 </head>
 <body>
 
-    <div class="plyr__video-embed" id="player">
-        <iframe src="" allowfullscreen allowtransparency allow="autoplay"></iframe>
+    <div class="video-container">
+        <div id="player" data-plyr-provider="youtube"></div>
     </div>
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    
     <script>
-        // 1. Obtener el ID del video de la URL (?v=ID)
-        const urlParams = new URLSearchParams(window.location.search);
-        const videoId = urlParams.get('v');
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Obtener el ID del video desde la URL (?v=ID)
+            const params = new URLSearchParams(window.location.search);
+            const videoId = params.get('v');
+            const playerElement = document.querySelector('#player');
 
-        if (videoId) {
-            const iframe = document.querySelector('iframe');
-            iframe.src = `https://www.youtube.com/embed/${videoId}?origin=https://plyr.io&iv_load_policy=3&modestbranding=1&playsinline=1&showinfo=0&rel=0&enablejsapi=1`;
-            
-            // 2. Inicializar Plyr
-            const player = new Plyr('#player');
-        } else {
-            document.body.innerHTML = "<h1 style='color:white; text-align:center;'>No se detectó ID de video</h1>";
-        }
+            if (videoId && playerElement) {
+                // 2. Inyectar el ID de YouTube en el atributo de Plyr
+                playerElement.setAttribute('data-plyr-embed-id', videoId);
+
+                // 3. Inicializar el reproductor con opciones de auto-reproducción
+                const player = new Plyr('#player', {
+                    autoplay: true,
+                    muted: false, // Algunos navegadores bloquean el autoplay si no está muteado
+                    hideControls: false,
+                    tooltips: { controls: true, seek: true },
+                    settings: ['quality', 'speed', 'loop']
+                });
+
+                // Forzar reproducción cuando esté listo (intento de bypass de restricciones)
+                player.on('ready', (event) => {
+                    player.play();
+                });
+
+            } else {
+                // Mensaje en caso de que no haya ID
+                document.body.innerHTML = "<h2 style='color:white; text-align:center;'>Error: No se proporcionó un ID de video válido.</h2>";
+            }
+        });
     </script>
 </body>
 </html>
